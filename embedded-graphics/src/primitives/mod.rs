@@ -2,11 +2,14 @@
 
 pub mod circle;
 pub mod line;
+pub mod polyline;
 pub mod rectangle;
 mod thick_line_iterator;
 pub mod triangle;
 
-pub use self::{circle::Circle, line::Line, rectangle::Rectangle, triangle::Triangle};
+pub use self::{
+    circle::Circle, line::Line, polyline::Polyline, rectangle::Rectangle, triangle::Triangle,
+};
 use crate::{
     geometry::Dimensions,
     pixelcolor::PixelColor,
