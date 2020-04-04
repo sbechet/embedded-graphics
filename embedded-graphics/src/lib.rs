@@ -6,6 +6,7 @@
 //!     * [Lines](./primitives/line/struct.Line.html)
 //!     * [Rectangles (and squares)](./primitives/rectangle/struct.Rectangle.html)
 //!     * [Circles](./primitives/circle/struct.Circle.html)
+//!     * [Ellipses](./primitives/ellipse/struct.Ellipse.html)
 //!     * [Triangles](./primitives/triangle/struct.Triangle.html)
 //! * [Text with multiple fonts](./fonts/index.html#types)
 //!
