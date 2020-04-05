@@ -47,14 +47,21 @@ impl<'a> Polyline<'a> {
 
 impl<'a> Primitive for Polyline<'a> {}
 
-// TODO
 impl<'a> Dimensions for Polyline<'a> {
     fn top_left(&self) -> Point {
-        Point::zero()
+        self.vertices
+            .iter()
+            .fold(Point::new(core::i32::MAX, core::i32::MAX), |accum, v| {
+                Point::new(accum.x.min(v.x), accum.y.min(v.y))
+            })
     }
 
     fn bottom_right(&self) -> Point {
-        self.top_left() + Point::zero()
+        self.vertices
+            .iter()
+            .fold(Point::new(core::i32::MIN, core::i32::MIN), |accum, v| {
+                Point::new(accum.x.max(v.x), accum.y.max(v.y))
+            })
     }
 
     fn size(&self) -> Size {
@@ -179,5 +186,41 @@ mod tests {
     use super::*;
     use crate::{drawable::Pixel, pixelcolor::BinaryColor};
 
-    // TODO
+    // A "heartbeat" shaped polyline
+    const HEARTBEAT: [Point; 10] = [
+        Point::new(10, 64),
+        Point::new(50, 64),
+        Point::new(60, 44),
+        Point::new(70, 64),
+        Point::new(80, 64),
+        Point::new(90, 74),
+        Point::new(100, 10),
+        Point::new(110, 84),
+        Point::new(120, 64),
+        Point::new(300, 64),
+    ];
+
+    #[test]
+    fn positive_dimensions() {
+        let polyline = Polyline::new(&HEARTBEAT);
+
+        assert_eq!(polyline.top_left(), Point::new(10, 10));
+        assert_eq!(polyline.bottom_right(), Point::new(300, 84));
+        assert_eq!(polyline.size(), Size::new(290, 74));
+    }
+
+    #[test]
+    fn negative_dimensions() {
+        let mut negative: [Point; 10] = [Point::zero(); 10];
+
+        for (i, v) in HEARTBEAT.iter().enumerate() {
+            negative[i] = *v - Point::new(100, 100);
+        }
+
+        let polyline = Polyline::new(&negative);
+
+        assert_eq!(polyline.top_left(), Point::new(-90, -90));
+        assert_eq!(polyline.bottom_right(), Point::new(200, -16));
+        assert_eq!(polyline.size(), Size::new(290, 74));
+    }
 }
