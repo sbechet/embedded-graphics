@@ -65,39 +65,28 @@ impl<'a> Dimensions for Polyline<'a> {
 /// TODO: Docs
 #[derive(Copy, Clone, Eq, PartialEq, Ord, PartialOrd, Hash, Debug)]
 pub struct PolylineIterator<'a> {
-    line: Polyline<'a>,
+    stop: bool,
+    vertices: &'a [Point],
     segment_iter: ThickLineIterator,
-    start_idx: usize,
-    end_idx: usize,
 }
 
 impl<'a> Iterator for PolylineIterator<'a> {
     type Item = Point;
 
     fn next(&mut self) -> Option<Self::Item> {
-        // Break if we're past the end of the line
-        if self.line.vertices.len() < 2 {
+        if self.stop {
             return None;
         }
 
         if let Some(p) = self.segment_iter.next() {
             Some(p)
         } else {
-            self.start_idx += 1;
-            self.end_idx += 1;
+            let (start, rest) = self.vertices.split_first()?;
+            let end = rest.get(0)?;
 
-            // Break if we've gone past the end of the line
-            if self.end_idx == self.line.vertices.len() {
-                return None;
-            }
+            self.vertices = rest;
 
-            self.segment_iter = ThickLineIterator::new(
-                &Line::new(
-                    self.line.vertices[self.start_idx],
-                    self.line.vertices[self.end_idx],
-                ),
-                1,
-            );
+            self.segment_iter = ThickLineIterator::new(&Line::new(*start, *end), 1);
 
             Self::next(self)
         }
@@ -109,18 +98,24 @@ impl<'a> IntoIterator for Polyline<'a> {
     type IntoIter = PolylineIterator<'a>;
 
     fn into_iter(self) -> Self::IntoIter {
-        let start_idx = 0;
-        let end_idx = 1;
-
-        Self::IntoIter {
-            start_idx,
-            end_idx,
-            line: self,
-            segment_iter: ThickLineIterator::new(
-                &Line::new(self.vertices[start_idx], self.vertices[end_idx]),
-                1,
-            ),
-        }
+        self.vertices
+            .split_first()
+            .and_then(|(start, rest)| {
+                // Polyline is 2 or more vertices long, return an iterator for it
+                rest.get(0).map(|end| Self::IntoIter {
+                    stop: false,
+                    vertices: rest,
+                    segment_iter: ThickLineIterator::new(&Line::new(*start, *end), 1),
+                })
+            })
+            .unwrap_or_else(||
+                // Polyline is less than 2 vertices long. Return a dummy iterator that will short
+                // circuit due to `stop: true`
+                Self::IntoIter {
+                    stop: true,
+                    vertices: &[],
+                    segment_iter: ThickLineIterator::new(&Line::new(Point::zero(), Point::zero()), 1),
+                })
     }
 }
 
