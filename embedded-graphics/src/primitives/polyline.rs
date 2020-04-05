@@ -1,5 +1,6 @@
 //! The line primitive
 
+// TODO: Group imports
 use crate::draw_target::DrawTarget;
 use crate::drawable::Drawable;
 use crate::drawable::Pixel;
@@ -39,8 +40,16 @@ pub struct Polyline<'a> {
 }
 
 impl<'a> Polyline<'a> {
-    /// Create a new polyline from a list of points or an iterator
+    /// Create a new polyline from a list of vertices
+    ///
+    /// # Panics
+    ///
+    /// This method will panic if the number of vertices is less than 2
     pub fn new(vertices: &'a [Point]) -> Self {
+        if vertices.len() < 2 {
+            panic!("Polyline must contain at least two vertices");
+        }
+
         Self { vertices }
     }
 }
