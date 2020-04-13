@@ -3,6 +3,9 @@
 //! Click and drag to move the bottom right corner of the ellipse's bounding box around the screen.
 //!
 //! The stroke size can be increased or decreased using the up and down arrow keys.
+//!
+//! This example is not particularly useful on it's own, but is helpful when debugging ellipse
+//! rendering.
 
 use embedded_graphics::{
     egtext,
