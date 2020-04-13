@@ -489,6 +489,26 @@ mod tests {
     }
 
     #[test]
+    fn ellipse() {
+        let _c: Styled<Ellipse, PrimitiveStyle<Rgb565>> =
+            egellipse!(top_left = Point::new(10, 20), size = Size::new(30, 50));
+        let _c: Styled<Ellipse, PrimitiveStyle<Rgb565>> =
+            egellipse!(top_left = (10, 20), size = Size::new(30, 50));
+        let _c: Styled<Ellipse, PrimitiveStyle<Rgb565>> =
+            egellipse!(center = (10, 20), size = Size::new(30, 50));
+        let _c: Styled<Ellipse, PrimitiveStyle<Rgb565>> = egellipse!(
+            top_left = (10, 20),
+            size = Size::new(30, 50),
+            style = primitive_style!(stroke_color = Rgb565::RED, fill_color = Rgb565::GREEN),
+        );
+        let _c: Styled<Ellipse, PrimitiveStyle<Rgb565>> = egellipse!(
+            center = (10, 20),
+            size = Size::new(30, 50),
+            style = primitive_style!(stroke_color = Rgb565::RED, fill_color = Rgb565::GREEN),
+        );
+    }
+
+    #[test]
     fn line() {
         let _l: Styled<Line, PrimitiveStyle<Rgb565>> =
             egline!(start = Point::new(10, 20), end = Point::new(30, 40),);
